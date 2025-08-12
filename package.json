@@ -25,6 +25,7 @@
     "@nestjs/platform-express": "^11.0.1",
     "bullmq": "^5.56.10",
     "express": "^5.1.0",
+    "redis": "^5.8.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
   },
