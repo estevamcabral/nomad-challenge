@@ -34,4 +34,4 @@ Testes rápidos com curl:
 
 Stack:
 
-- NestJS 11, TypeORM, PostgreSQL e Redis (via Docker Compose), BullMQ, Jest, ESLint, Prettier
+- NestJS 11, TypeORM, PostgreSQL e Redis (via Docker Compose)
