@@ -64,7 +64,7 @@ export class MatchParticipationService {
   async incrementDeaths(
     player: Player,
     match: Match,
-    killsDelta = 1,
+    deathsDelta = 1,
   ): Promise<MatchParticipation> {
     const participation = await this.participationRepository.findOne({
       where: { player: { name: player.name }, match: { id: match.id } },
@@ -75,9 +75,9 @@ export class MatchParticipationService {
       this.logger.error('Participation not found');
     }
 
-    participation.totalDeaths += killsDelta;
+    participation.totalDeaths += deathsDelta;
     this.logger.log(
-      `Atualizando kills: player=${player.name}, match=${match.id}, totalKills=${participation.totalDeaths}`,
+      `Atualizando deaths: player=${player.name}, match=${match.id}, totalDeaths=${participation.totalDeaths}`,
     );
 
     return this.participationRepository.save(participation);
