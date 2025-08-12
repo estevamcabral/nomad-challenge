@@ -6,7 +6,7 @@ import { parseEvent } from '../event/parser/events.parser';
 export class UploadsService {
   private readonly logger = new Logger(UploadsService.name);
 
-  constructor(private readonly eventsQueueService: EventProducerService) {}
+  constructor(private readonly eventsProducerService: EventProducerService) {}
 
   async processLogLine(line: string): Promise<void> {
     const event = parseEvent(line);
@@ -16,6 +16,6 @@ export class UploadsService {
       return;
     }
 
-    await this.eventsQueueService.addEvent(event);
+    await this.eventsProducerService.addEvent(event);
   }
 }

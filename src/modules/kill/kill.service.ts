@@ -20,16 +20,16 @@ export class KillService {
   ) {}
 
   async handleKill(event: KillEvent) {
+    if (event.killer === '<WORLD>') {
+      this.logger.warn(`World kill: ${event.killer}`);
+      return;
+    }
+
     const matchId = await this.matchService.getLastMatchCreatedId();
     const match = await this.matchService.findMatchById(matchId);
 
     if (!match) {
       this.logger.warn(`Match not found: ${matchId}`);
-      return;
-    }
-
-    if (event.killer === '<WORLD>') {
-      this.logger.warn(`World kill: ${event.killer}`);
       return;
     }
 
