@@ -4,7 +4,7 @@ import {
   KillEvent,
   MatchEnded,
   MatchStarted,
-} from '../events.interface';
+} from '../event.interface';
 
 function parseDate(dateStr: string): Date {
   const [day, month, yearAndTime] = dateStr.split('/');
@@ -22,6 +22,7 @@ export function parseEvent(line: string): Event | null {
 
   if (eventStr.startsWith('New match')) {
     const matchId = parseInt(eventStr.match(/\d+/)?.[0] || '0');
+    console.log(matchId);
     return {
       timestamp,
       type: EventType.MATCH_STARTED,

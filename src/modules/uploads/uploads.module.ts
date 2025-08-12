@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { UploadsController } from './uploads.controller';
-import { EventsModule } from '../events/events.module';
+import { EventModule } from '../event/event.module';
 import { UploadsService } from './uploads.service';
 
 @Module({
-  imports: [EventsModule],
+  imports: [EventModule],
   controllers: [UploadsController],
   providers: [UploadsService],
 })

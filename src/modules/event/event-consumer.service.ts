@@ -7,15 +7,25 @@ import {
 } from '@nestjs/common';
 import { Worker } from 'bullmq';
 import Redis from 'ioredis';
-import { EventType } from './events.interface';
+import {
+  Event,
+  EventType,
+  KillEvent,
+  MatchEnded,
+  MatchStarted,
+} from './event.interface';
+import { MatchService } from '../match/match.service';
+import { KillService } from '../kill/kill.service';
 
 @Injectable()
-export class EventsConsumerService implements OnModuleInit, OnModuleDestroy {
-  private readonly logger = new Logger(EventsConsumerService.name);
+export class EventConsumerService implements OnModuleInit, OnModuleDestroy {
+  private readonly logger = new Logger(EventConsumerService.name);
   private worker: Worker | null = null;
 
   constructor(
     @Inject('BULLMQ_CONNECTION') private readonly connection: Redis,
+    private matchesService: MatchService,
+    private killService: KillService,
   ) {}
 
   onModuleInit() {
@@ -23,7 +33,7 @@ export class EventsConsumerService implements OnModuleInit, OnModuleDestroy {
       'events',
       async (job) => {
         this.logger.log(`Processing event: ${JSON.stringify(job.data)}`);
-        this.dispatchEvent(job.data);
+        await this.dispatchEvent(job.data);
       },
       { connection: this.connection },
     );
@@ -33,16 +43,16 @@ export class EventsConsumerService implements OnModuleInit, OnModuleDestroy {
     await this.worker?.close();
   }
 
-  private dispatchEvent(event: Event) {
+  async dispatchEvent(event: Event) {
     switch (event.type) {
       case EventType.MATCH_STARTED:
-        console.log('MATCH_STARTED');
+        await this.matchesService.createMatch(event as MatchStarted);
         break;
       case EventType.KILL:
-        console.log('KILL');
+        await this.killService.handleKill(event as KillEvent);
         break;
       case EventType.MATCH_ENDED:
-        console.log('MATCH_ENDED');
+        await this.matchesService.endMatch(event as MatchEnded);
         break;
       default:
         this.logger.warn(`Unknown event type: ${event.type}`);

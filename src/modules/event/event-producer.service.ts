@@ -1,10 +1,10 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Queue } from 'bullmq';
-import { Event } from './events.interface';
+import { Event } from './event.interface';
 
 @Injectable()
-export class EventsProducerService {
-  private readonly logger = new Logger(EventsProducerService.name);
+export class EventProducerService {
+  private readonly logger = new Logger(EventProducerService.name);
 
   constructor(@Inject('BULLMQ_QUEUE') private readonly queue: Queue) {}
 

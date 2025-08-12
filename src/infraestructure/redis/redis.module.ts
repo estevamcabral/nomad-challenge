@@ -9,7 +9,7 @@ import Redis from 'ioredis';
       provide: 'BULLMQ_CONNECTION',
       useFactory: () =>
         new Redis({
-          host: 'localhost',
+          host: '127.0.0.1',
           port: 6379,
           maxRetriesPerRequest: null,
           enableReadyCheck: false,
@@ -27,7 +27,12 @@ import Redis from 'ioredis';
         }),
       inject: ['BULLMQ_CONNECTION'],
     },
+    {
+      provide: 'CACHE_REDIS',
+      useFactory: (connection: Redis) => connection,
+      inject: ['BULLMQ_CONNECTION'],
+    },
   ],
-  exports: ['BULLMQ_CONNECTION', 'BULLMQ_QUEUE'],
+  exports: ['BULLMQ_CONNECTION', 'BULLMQ_QUEUE', 'CACHE_REDIS'],
 })
-export class RedisQueueModule {}
+export class RedisModule {}
