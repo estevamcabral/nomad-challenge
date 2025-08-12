@@ -1,13 +1,13 @@
-import { EventProducerService } from './event-producer.service';
-import { EventConsumerService } from './event-consumer.service';
-import { MatchService } from '../match/match.service';
-import { KillService } from '../kill/kill.service';
+import { EventProducerService } from '../event-producer.service';
+import { EventConsumerService } from '../event-consumer.service';
+import { MatchService } from '../../match/match.service';
+import { KillService } from '../../kill/kill.service';
 import {
   EventType,
   KillEvent,
   MatchEnded,
   MatchStarted,
-} from './event.interface';
+} from '../event.interface';
 import { Worker } from 'bullmq';
 
 jest.mock('bullmq', () => {

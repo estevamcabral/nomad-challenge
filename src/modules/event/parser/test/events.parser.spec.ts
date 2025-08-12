@@ -1,5 +1,5 @@
-import { parseEvent } from './events.parser';
-import { KillEvent, MatchEnded, MatchStarted } from '../event.interface';
+import { parseEvent } from '../events.parser';
+import { KillEvent, MatchEnded, MatchStarted } from '../../event.interface';
 
 describe('parseEvent completo', () => {
   it('parseia MATCH_STARTED corretamente', () => {
