@@ -29,6 +29,10 @@ infraestrutura e de negócios, garantindo baixo acoplamento, alta coesão e proc
 exposição HTTP (como a de estatísticas) é feita via controllers, e a execução é containerizada com Docker/Docker Compose
 para subir facilmente API, banco e Redis.
 
+A aplicação possui testes unitários em todos os módulos, além de testes de integração que podem ser executados com o
+comando
+`npm run test:integration`.
+
 <img width="1495" height="857" alt="image" src="https://github.com/user-attachments/assets/29eebc1c-0e39-44b9-ad94-f7a7bd99633c" />
 
 Stack:
