@@ -63,7 +63,13 @@ export class UploadsController {
     }
 
     const content = file.buffer.toString('utf-8');
-    const entries: string[] = JSON.parse(content);
+    let entries: string[];
+    
+    try {
+      entries = JSON.parse(content);
+    } catch (error) {
+      throw new BadRequestException('Invalid JSON format');
+    }
 
     for (const entry of entries) {
       await this.uploadsService.processLogLine(entry);

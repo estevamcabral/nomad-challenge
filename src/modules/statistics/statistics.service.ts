@@ -52,6 +52,10 @@ export class StatisticsService {
       .take(1)
       .getOne();
 
+    if (!winner) {
+      return {} as PreferredWeaponResult;
+    }
+
     const row = await this.killRepository
       .createQueryBuilder('kill')
       .innerJoin('kill.killer', 'killer')
@@ -66,12 +70,12 @@ export class StatisticsService {
       .take(1)
       .getRawOne<{
         weapon: string;
-        useCount: number;
+        useCount: string;
       }>();
 
     return {
       preferredWeapon: row.weapon,
-      weaponUsageCount: row.useCount,
+      weaponUsageCount: Number(row.useCount),
       winnerName: winner.player.name,
     };
   }
@@ -79,8 +83,7 @@ export class StatisticsService {
   async getGlobalRanking(
     pagination: PaginationParams,
   ): Promise<MatchRankingResult[]> {
-    const pageNumber = pagination.pageNumber ?? 0;
-    const size = pagination.size ?? 100;
+    const { pageNumber, size } = pagination;
 
     const rows = await this.participationRepository
       .createQueryBuilder('participation')
@@ -114,7 +117,7 @@ export class StatisticsService {
     });
 
     if (!kills.length) {
-      return { playerName: '', longestStreak: 0 };
+      return {} as LongestStreakResult;
     }
 
     const currentStreak = new Map<string, number>();

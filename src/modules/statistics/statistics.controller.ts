@@ -138,9 +138,12 @@ export class StatisticsController {
     @Query('pageNumber') pageNumber?: string,
     @Query('size') size?: string,
   ) {
+    const parsedPageNumber = pageNumber ? parseInt(pageNumber) : 0;
+    const parsedSize = size ? parseInt(size) : 100;
+    
     const pagination: PaginationParams = {
-      pageNumber: pageNumber ? parseInt(pageNumber) : 0,
-      size: size ? parseInt(size) : 100,
+      pageNumber: isNaN(parsedPageNumber) ? 0 : parsedPageNumber,
+      size: isNaN(parsedSize) ? 100 : parsedSize,
     };
 
     return this.statisticsService.getGlobalRanking(pagination);
