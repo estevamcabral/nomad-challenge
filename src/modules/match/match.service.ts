@@ -61,3 +61,10 @@ export class MatchService {
     await this.matchRepository.save(match);
   }
 }
+
+export class MatchFullError extends Error {
+  constructor(matchId: number) {
+    super(`Match ${matchId} is full`);
+    this.name = 'MatchFullError';
+  }
+}

@@ -1,11 +1,17 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  Index,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Match } from '../match/match.entity';
 import { Player } from '../player/player.entity';
 
 @Entity()
 export class Kill {
   @PrimaryGeneratedColumn('uuid')
-  id: number;
+  id: string;
 
   @Column({ type: 'timestamp' })
   timestamp: Date;
@@ -13,6 +19,7 @@ export class Kill {
   @ManyToOne(() => Match)
   match: Match;
 
+  @Index()
   @ManyToOne(() => Player, { eager: true })
   killer: Player;
 

@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Kill } from './kill.entity';
 import { KillEvent } from '../event/event.interface';
-import { MatchService } from '../match/match.service';
+import { MatchFullError, MatchService } from '../match/match.service';
 import { PlayerService } from '../player/player.service';
 import { MatchParticipationService } from '../match-participation/match-participation.service';
 
@@ -38,6 +38,20 @@ export class KillService {
       this.playerService.findOrCreatePlayer(event.victim),
     ]);
 
+    try {
+      await Promise.all([
+        this.matchParticipationService.associatePlayerToMatch(killer, match),
+        this.matchParticipationService.associatePlayerToMatch(victim, match),
+      ]);
+    } catch (error) {
+      if (error instanceof MatchFullError) {
+        this.logger.warn(`Match ${matchId} is full`);
+        return;
+      }
+
+      throw error;
+    }
+
     const kill = this.killRepository.create({
       timestamp: event.timestamp,
       match,
@@ -45,11 +59,6 @@ export class KillService {
       victim,
       weapon: event.weapon,
     });
-
-    await Promise.all([
-      this.matchParticipationService.associatePlayerToMatch(killer, match),
-      this.matchParticipationService.associatePlayerToMatch(victim, match),
-    ]);
 
     await Promise.all([
       this.matchParticipationService.incrementKills(killer, match),

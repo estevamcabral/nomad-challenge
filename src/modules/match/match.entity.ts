@@ -11,3 +11,5 @@ export class Match {
   @Column({ type: 'timestamp', nullable: true })
   endedAt?: Date;
 }
+
+export const MAX_NUMBER_OF_PLAYERS: number = 20;

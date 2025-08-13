@@ -1,4 +1,3 @@
-// test/statistics.controller.spec.ts
 import { Test, TestingModule } from '@nestjs/testing';
 import { StatisticsController } from '../statistics.controller';
 import { StatisticsService } from '../statistics.service';
@@ -34,26 +33,12 @@ describe('StatisticsController', () => {
         { playerName: 'A', totalKills: 1, totalDeaths: 0 },
       ]);
 
-      const result = await controller.getMatchRankingByMatch(123, '2', '25');
+      const result = await controller.getMatchRankingByMatch(123);
 
-      expect(serviceMock.getMatchRanking).toHaveBeenCalledWith(123, {
-        pageNumber: 2,
-        size: 25,
-      });
+      expect(serviceMock.getMatchRanking).toHaveBeenCalledWith(123);
       expect(result).toEqual([
         { playerName: 'A', totalKills: 1, totalDeaths: 0 },
       ]);
-    });
-
-    it('usa defaults quando query não é passada', async () => {
-      serviceMock.getMatchRanking.mockResolvedValue([]);
-
-      await controller.getMatchRankingByMatch(5, undefined, undefined);
-
-      expect(serviceMock.getMatchRanking).toHaveBeenCalledWith(5, {
-        pageNumber: 0,
-        size: 100,
-      });
     });
   });
 

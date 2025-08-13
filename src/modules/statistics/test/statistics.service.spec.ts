@@ -21,7 +21,6 @@ function createQb(): Qb {
   qb.addSelect = jest.fn().mockReturnValue(qb);
   qb.skip = jest.fn().mockReturnValue(qb);
   qb.take = jest.fn().mockReturnValue(qb);
-  // terminal methods (set per test)
   qb.getMany = jest.fn();
   qb.getOne = jest.fn();
   qb.getRawMany = jest.fn();
@@ -50,6 +49,7 @@ describe('StatisticsService', () => {
           provide: getRepositoryToken(Kill),
           useValue: {
             createQueryBuilder: jest.fn(),
+            find: jest.fn(),
           },
         },
         {
@@ -238,7 +238,7 @@ describe('StatisticsService', () => {
         'ASC',
       );
       expect(qb.addOrderBy).toHaveBeenCalledWith('player.name', 'ASC');
-      expect(qb.skip).toHaveBeenCalledWith(1 * 50);
+      expect(qb.skip).toHaveBeenCalledWith(50);
       expect(qb.take).toHaveBeenCalledWith(50);
 
       expect(result).toEqual([
@@ -260,9 +260,72 @@ describe('StatisticsService', () => {
   });
 
   describe('getLongestKillStreak', () => {
-    it('retorna null (não implementado)', async () => {
+    it('retorna { playerName: "", longestStreak: 0 } quando não há kills na partida', async () => {
+      (killRepo.find as jest.Mock).mockResolvedValue([]);
+
       const result = await service.getLongestKillStreak(999);
-      expect(result).toBeNull();
+
+      expect(killRepo.find).toHaveBeenCalledWith({
+        where: { match: { id: 999 } as any },
+        order: { timestamp: 'ASC' },
+      });
+      expect(result).toEqual({ playerName: '', longestStreak: 0 });
+    });
+
+    it('calcula a maior streak ignorando <WORLD> e resetando ao morrer', async () => {
+      const base = new Date('2023-01-01T12:00:00Z').getTime();
+      const t = (i: number) => new Date(base + i * 1000);
+
+      const kills: Partial<Kill>[] = [
+        {
+          timestamp: t(1),
+          killer: { name: 'Alice' } as any,
+          victim: { name: 'Bob' } as any,
+        },
+        {
+          timestamp: t(2),
+          killer: { name: 'Alice' } as any,
+          victim: { name: 'Charlie' } as any,
+        },
+        {
+          timestamp: t(3),
+          killer: { name: '<WORLD>' } as any,
+          victim: { name: 'Alice' } as any,
+        },
+        {
+          timestamp: t(4),
+          killer: { name: 'Bob' } as any,
+          victim: { name: 'Charlie' } as any,
+        },
+        {
+          timestamp: t(5),
+          killer: { name: 'Bob' } as any,
+          victim: { name: 'Alice' } as any,
+        },
+        {
+          timestamp: t(6),
+          killer: { name: 'Bob' } as any,
+          victim: { name: 'Derek' } as any,
+        },
+        {
+          timestamp: t(7),
+          killer: { name: 'Charlie' } as any,
+          victim: { name: 'Bob' } as any,
+        },
+      ] as any[];
+
+      (killRepo.find as jest.Mock).mockResolvedValue(kills);
+
+      const result = await service.getLongestKillStreak(42);
+
+      expect(killRepo.find).toHaveBeenCalledWith({
+        where: { match: { id: 42 } as any },
+        order: { timestamp: 'ASC' },
+      });
+      expect(result).toEqual({
+        playerName: 'Bob',
+        longestStreak: 3,
+      });
     });
   });
 });

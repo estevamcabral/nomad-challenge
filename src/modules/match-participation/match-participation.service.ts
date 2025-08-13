@@ -1,9 +1,10 @@
 import { Player } from '../player/player.entity';
-import { Match } from '../match/match.entity';
+import { Match, MAX_NUMBER_OF_PLAYERS } from '../match/match.entity';
 import { MatchParticipation } from './match-participation.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable, Logger } from '@nestjs/common';
 import { Repository } from 'typeorm';
+import { MatchFullError } from '../match/match.service';
 
 @Injectable()
 export class MatchParticipationService {
@@ -24,6 +25,16 @@ export class MatchParticipationService {
     });
 
     if (participation) return participation;
+
+    const numberOfParticipants = await this.participationRepository.count({
+      where: {
+        match: { id: match.id },
+      },
+    });
+
+    if (numberOfParticipants === MAX_NUMBER_OF_PLAYERS) {
+      throw new MatchFullError(match.id);
+    }
 
     participation = this.participationRepository.create({
       player,

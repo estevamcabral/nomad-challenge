@@ -22,20 +22,13 @@ export class StatisticsService {
     private readonly matchRepository: Repository<Match>,
   ) {}
 
-  async getMatchRanking(
-    matchId: number,
-    pagination: PaginationParams = {},
-  ): Promise<MatchRankingResult[]> {
-    const { pageNumber, size } = pagination;
-
+  async getMatchRanking(matchId: number): Promise<MatchRankingResult[]> {
     const query = this.participationRepository
       .createQueryBuilder('participation')
       .leftJoinAndSelect('participation.player', 'player')
       .leftJoinAndSelect('participation.match', 'match')
       .orderBy('participation.totalKills', 'DESC')
-      .where('match.id = :matchId', { matchId })
-      .skip(pageNumber * size)
-      .take(size);
+      .where('match.id = :matchId', { matchId });
 
     const participations = await query.getMany();
 
@@ -115,6 +108,42 @@ export class StatisticsService {
   }
 
   async getLongestKillStreak(matchId: number): Promise<LongestStreakResult> {
-    return null;
+    const kills = await this.killRepository.find({
+      where: { match: { id: matchId } as any },
+      order: { timestamp: 'ASC' },
+    });
+
+    if (!kills.length) {
+      return { playerName: '', longestStreak: 0 };
+    }
+
+    const currentStreak = new Map<string, number>();
+
+    let maxStreak = 0;
+    let maxPlayer = '';
+
+    for (const k of kills) {
+      const killerName = k.killer.name;
+      const victimName = k.victim.name;
+
+      if (killerName && killerName !== '<WORLD>') {
+        const next = (currentStreak.get(killerName) ?? 0) + 1;
+        currentStreak.set(killerName, next);
+
+        if (next > maxStreak) {
+          maxStreak = next;
+          maxPlayer = killerName;
+        }
+      }
+
+      if (victimName) {
+        currentStreak.set(victimName, 0);
+      }
+    }
+
+    return {
+      playerName: maxPlayer,
+      longestStreak: maxStreak,
+    };
   }
 }
