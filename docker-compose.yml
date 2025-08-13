@@ -4,7 +4,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
+      POSTGRES_DB: nomad-events
     ports:
       - "5432:5432"
 
@@ -13,20 +13,20 @@ services:
     ports:
       - "6379:6379"
 
-#  app:
-#    build:
-#      context: .
-#      dockerfile: Dockerfile
-#    ports:
-#      - "3000:3000"
-#    environment:
-#      DATABASE_HOST: postgres
-#      DATABASE_PORT: 5432
-#      DATABASE_USER: postgres
-#      DATABASE_PASSWORD: postgres
-#      DATABASE_NAME: postgres
-#      REDIS_HOST: redis
-#      REDIS_PORT: 6379
-#    depends_on:
-#      - postgres
-#      - redis
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: postgres
+      DATABASE_NAME: nomad-events
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    depends_on:
+      - postgres
+      - redis

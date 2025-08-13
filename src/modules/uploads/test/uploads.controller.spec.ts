@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UploadsController } from '../uploads.controller';
 import { UploadsService } from '../uploads.service';
+import { BadRequestException } from '@nestjs/common';
 
 describe('UploadsController', () => {
   let controller: UploadsController;
@@ -21,19 +22,29 @@ describe('UploadsController', () => {
     service = module.get<UploadsService>(UploadsService);
   });
 
-  it('should call processLogLine for each file and return result', async () => {
-    const files = ['file1', 'file2'];
+  it('deve processar o conteúdo JSON do arquivo e retornar o resultado', async () => {
+    const entries = ['line1', 'line2'];
+    const file = {
+      buffer: Buffer.from(JSON.stringify(entries), 'utf-8'),
+    } as any;
+
     (service.processLogLine as jest.Mock).mockResolvedValue(undefined);
 
-    const result = await controller.upload(files);
+    const result = await controller.upload(file);
 
-    expect(service.processLogLine).toHaveBeenCalledTimes(files.length);
-    files.forEach((file, i) => {
-      expect(service.processLogLine).toHaveBeenNthCalledWith(i + 1, file);
+    expect(service.processLogLine).toHaveBeenCalledTimes(entries.length);
+    entries.forEach((entry, i) => {
+      expect(service.processLogLine).toHaveBeenNthCalledWith(i + 1, entry);
     });
     expect(result).toEqual({
       message: 'Upload completed',
-      count: files.length,
+      count: entries.length,
     });
+  });
+
+  it('deve lançar BadRequestException quando nenhum arquivo for enviado', async () => {
+    await expect(controller.upload(undefined as any)).rejects.toBeInstanceOf(
+      BadRequestException,
+    );
   });
 });

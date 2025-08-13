@@ -92,8 +92,8 @@ export class StatisticsService {
       .orderBy('SUM(participation.totalKills)', 'DESC')
       .addOrderBy('SUM(participation.totalDeaths)', 'ASC')
       .addOrderBy('player.name', 'ASC')
-      .skip(pageNumber * size)
-      .take(size)
+      .offset(pageNumber * size)
+      .limit(size)
       .getRawMany<{
         playerName: string;
         totalKills: string | number;

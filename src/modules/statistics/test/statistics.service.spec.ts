@@ -21,6 +21,8 @@ function createQb(): Qb {
   qb.addSelect = jest.fn().mockReturnValue(qb);
   qb.skip = jest.fn().mockReturnValue(qb);
   qb.take = jest.fn().mockReturnValue(qb);
+  qb.offset = jest.fn().mockReturnValue(qb);
+  qb.limit = jest.fn().mockReturnValue(qb);
   qb.getMany = jest.fn();
   qb.getOne = jest.fn();
   qb.getRawMany = jest.fn();
@@ -76,7 +78,6 @@ describe('StatisticsService', () => {
     it('retorna ranking da partida respeitando paginação', async () => {
       const qb = createQb();
       const matchId = 42;
-      const pagination = { pageNumber: 2, size: 10 };
 
       const fakeParticipations: any[] = [
         {
@@ -94,7 +95,7 @@ describe('StatisticsService', () => {
       qb.getMany.mockResolvedValue(fakeParticipations);
       (participationRepo.createQueryBuilder as jest.Mock).mockReturnValue(qb);
 
-      const result = await service.getMatchRanking(matchId, pagination);
+      const result = await service.getMatchRanking(matchId);
 
       expect(participationRepo.createQueryBuilder).toHaveBeenCalledWith(
         'participation',
@@ -112,26 +113,11 @@ describe('StatisticsService', () => {
         'DESC',
       );
       expect(qb.where).toHaveBeenCalledWith('match.id = :matchId', { matchId });
-      expect(qb.skip).toHaveBeenCalledWith(
-        pagination.pageNumber * pagination.size,
-      );
-      expect(qb.take).toHaveBeenCalledWith(pagination.size);
 
       expect(result).toEqual([
         { playerName: 'Alice', totalKills: 15, totalDeaths: 5 },
         { playerName: 'Bob', totalKills: 12, totalDeaths: 6 },
       ]);
-    });
-
-    it('usa paginação default quando não fornecida', async () => {
-      const qb = createQb();
-      qb.getMany.mockResolvedValue([]);
-      (participationRepo.createQueryBuilder as jest.Mock).mockReturnValue(qb);
-
-      await service.getMatchRanking(1, { pageNumber: 0, size: 100 });
-
-      expect(qb.skip).toHaveBeenCalledWith(0);
-      expect(qb.take).toHaveBeenCalledWith(100);
     });
   });
 
@@ -238,8 +224,8 @@ describe('StatisticsService', () => {
         'ASC',
       );
       expect(qb.addOrderBy).toHaveBeenCalledWith('player.name', 'ASC');
-      expect(qb.skip).toHaveBeenCalledWith(50);
-      expect(qb.take).toHaveBeenCalledWith(50);
+      expect(qb.offset).toHaveBeenCalledWith(50);
+      expect(qb.limit).toHaveBeenCalledWith(50);
 
       expect(result).toEqual([
         { playerName: 'Alice', totalKills: 30, totalDeaths: 10 },
@@ -254,8 +240,8 @@ describe('StatisticsService', () => {
 
       await service.getGlobalRanking({} as any);
 
-      expect(qb.skip).toHaveBeenCalledWith(0);
-      expect(qb.take).toHaveBeenCalledWith(100);
+      expect(qb.offset).toHaveBeenCalledWith(0);
+      expect(qb.limit).toHaveBeenCalledWith(100);
     });
   });
 

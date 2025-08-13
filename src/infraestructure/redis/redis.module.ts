@@ -9,8 +9,8 @@ import Redis from 'ioredis';
       provide: 'BULLMQ_CONNECTION',
       useFactory: () =>
         new Redis({
-          host: '127.0.0.1',
-          port: 6379,
+          host: process.env.REDIS_HOST || 'redis',
+          port: parseInt(process.env.REDIS_PORT || '6379', 10),
           maxRetriesPerRequest: null,
           enableReadyCheck: false,
         }),
