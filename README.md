@@ -32,6 +32,8 @@ Testes rápidos com curl:
   GET "[http://localhost:3000/statistics/global-ranking](http://localhost:3000/statistics/global-ranking)" -H "Accept:
   application/json"
 
+<img width="1495" height="857" alt="image" src="https://github.com/user-attachments/assets/29eebc1c-0e39-44b9-ad94-f7a7bd99633c" />
+
 Stack:
 
 - NestJS 11, TypeORM, PostgreSQL e Redis (via Docker Compose)
