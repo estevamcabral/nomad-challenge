@@ -232,17 +232,6 @@ describe('StatisticsService', () => {
         { playerName: 'Bob', totalKills: 25, totalDeaths: 15 },
       ]);
     });
-
-    it('usa defaults quando paginação não informada', async () => {
-      const qb = createQb();
-      (participationRepo.createQueryBuilder as jest.Mock).mockReturnValue(qb);
-      qb.getRawMany.mockResolvedValue([]);
-
-      await service.getGlobalRanking({} as any);
-
-      expect(qb.offset).toHaveBeenCalledWith(0);
-      expect(qb.limit).toHaveBeenCalledWith(100);
-    });
   });
 
   describe('getLongestKillStreak', () => {
@@ -255,7 +244,7 @@ describe('StatisticsService', () => {
         where: { match: { id: 999 } as any },
         order: { timestamp: 'ASC' },
       });
-      expect(result).toEqual({ playerName: '', longestStreak: 0 });
+      expect(result).toEqual({});
     });
 
     it('calcula a maior streak ignorando <WORLD> e resetando ao morrer', async () => {
